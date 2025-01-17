@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  isAdmin       Boolean        @default(false)
+  username      String         @unique
+  avatarUrl     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  subscriptions Subscription[] 
+  userLessons   UserLesson[]
+  userTopics    UserTopic[]
+}
+
+model Subscription {
+  id        String      @id @default(cuid())
+  type      ContentType
+  active    Boolean     @default(true)
+  startDate DateTime    @default(now())
+  endDate   DateTime
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+}
+
+model Folder {
+  id          String      @id @default(cuid())
+  name        String
+  about       String?
+  description String?
+  type        ContentType
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  topics      Topic[]
+}
+
+model Topic {
+  id          String      @id @default(cuid())
+  name        String
+  about       String?
+  description String?
+  folderId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  lessons     Lesson[]
+  folder      Folder      @relation(fields: [folderId], references: [id])
+  userTopics  UserTopic[]
+  type        ContentType 
+}
+
+model Lesson {
+  id                     String       @id @default(cuid())
+  name                   String
+  video                  String
+  about                  String?
+  description            String?
+  tasks                  Json[]
+  orderNumber            Int
+  views                  Int          @default(0)
+  isSubscriptionRequired Boolean      @default(true)
+  topicId                String
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  type                   ContentType
+  topic                  Topic        @relation(fields: [topicId], references: [id])
+  userLessons            UserLesson[]
+}
+
+model UserLesson {
+  id        String    @id @default(cuid())
+  userId    String
+  lessonId  String
+  completed Boolean   @default(false)
+  watchedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, lessonId])
+}
+
+model UserTopic {
+  id        String   @id @default(cuid())
+  userId    String
+  topicId   String
+  progress  Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, topicId])
+}
+
+enum ContentType {
+  player
+  coach
+  parent
+}
