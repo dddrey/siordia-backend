@@ -7,21 +7,28 @@ import { authMiddleware } from "./middleware/authMiddleware";
 import lessonRoutes from "./routes/lesson.routes";
 import topicRoutes from "./routes/topic.routes";
 import subscriptionRoutes from "./routes/subscription.routes";
-import "express-async-errors"; 
+import "express-async-errors";
+import { checkExpiredSubscriptions } from "./middleware/checkExpiredSubscriptions";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.config";
 
 const app = express();
 
-app.use(express.json()); // JSON-парсер
-app.use(parseInitDataMiddleware); // Middleware
-app.use("/", authRoutes); // Роуты, которые не требуют аутентификации (например, регистрация и логин)
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Добавляем аутентификацию после того, как прошли роуты, которые не требуют авторизации
-app.use(authMiddleware); // Теперь middleware авторизации применяется ко всем маршрутам, которые идут после него.
+app.use(express.json());
 
-app.use("/folders", folderRoutes); // Роуты, которые требуют аутентификации
-app.use("/topics", topicRoutes); // Роуты, которые требуют аутентификации
-app.use("/lessons", lessonRoutes); // Роуты, которые требуют аутентификации
-app.use("/subscriptions", subscriptionRoutes); // Роуты, которые требуют аутентификации
+app.use(parseInitDataMiddleware);
+
+app.use("/auth", authRoutes);
+
+app.use(authMiddleware);
+app.use(checkExpiredSubscriptions);
+
+app.use("/folders", folderRoutes);
+app.use("/topics", topicRoutes);
+app.use("/lessons", lessonRoutes);
+app.use("/subscriptions", subscriptionRoutes);
 
 app.use(errorHandler);
 

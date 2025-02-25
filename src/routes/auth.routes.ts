@@ -1,9 +1,15 @@
-import express, { Request, Response } from "express";
-import { authenticateUser } from "../controllers/auth.controller";
+import express from "express";
+import { authenticateUser } from "@/controllers/auth/authenticate";
+
 const router = express.Router();
 
-router.post("/auth", async (req: Request, res: Response) => {
-  await authenticateUser(req, res);
-});
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Авторизация
+ */
+
+router.post("/", authenticateUser);
 
 export default router;

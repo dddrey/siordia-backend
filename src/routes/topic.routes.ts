@@ -1,21 +1,27 @@
-import { Router } from 'express';
-import { isAdmin } from '../middleware/isAdmin';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { Router } from "express";
+import { isAdmin } from "@/middleware/isAdmin";
 import {
   getTopics,
   getTopicById,
   createTopic,
   updateTopic,
-  deleteTopic
-} from '../controllers/topic.controller';
+  deleteTopic,
+} from "@/controllers/topics/index";
 
 const router = Router();
 
-router.get('/', authMiddleware, getTopics);
-router.get('/:id', authMiddleware, getTopicById);
+/**
+ * @swagger
+ * tags:
+ *   name: Topics
+ *   description: Темы
+ */
 
-router.post('/', authMiddleware, isAdmin, createTopic);
-router.put('/:id', authMiddleware, isAdmin, updateTopic);
-router.delete('/:id', authMiddleware, isAdmin, deleteTopic);
+router.get("/", getTopics);
+router.get("/:id", getTopicById);
 
-export default router; 
+router.post("/", isAdmin, createTopic);
+router.put("/:id", isAdmin, updateTopic);
+router.delete("/:id", isAdmin, deleteTopic);
+
+export default router;

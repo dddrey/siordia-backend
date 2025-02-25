@@ -1,12 +1,15 @@
-import { Router } from 'express';
-import { addSubscription, removeAllSubscriptions, removeSubscriptionById } from "../controllers/subscription.controlle";
+import { Router } from "express";
+import { createSubscription } from "@/controllers/subscriptions/index";
 
 const router = Router();
 
-router.post('/', addSubscription);
+/**
+ * @swagger
+ * tags:
+ *   name: Subscription
+ *   description: Подписки
+ */
 
-router.delete('/:userId', removeAllSubscriptions);
+router.post("/", createSubscription);
 
-router.delete('/:subscriptionId', removeSubscriptionById);
-
-export default router;  
+export default router;

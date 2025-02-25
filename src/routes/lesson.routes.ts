@@ -1,27 +1,27 @@
-import { Router } from 'express';
-import { isAdmin } from '../middleware/isAdmin';
-import { checkSubscription } from '../middleware/cheak-subscription';
+import { Router } from "express";
+import { isAdmin } from "@/middleware/isAdmin";
 
 import {
-  getAdminLessons,
-  getUserLessons,
+  getLessons,
+  getLessonById,
   createLesson,
   updateLesson,
   deleteLesson,
-  getLessonById,
-  markLessonAsCompleted
-} from '../controllers/lesson.controller';
+} from "@/controllers/lessons/index";
 
 const router = Router();
 
-router.get('/admin', isAdmin, getAdminLessons);
-router.get('/', getUserLessons);
-router.get('/:id', checkSubscription, getLessonById);
-router.post("/:lessonId/complete", checkSubscription, markLessonAsCompleted);
+/**
+ * @swagger
+ * tags:
+ *   name: Lessons
+ *   description: Уроки
+ */
 
-router.get('/admin', isAdmin, getAdminLessons);
-router.post('/', isAdmin, createLesson);
-router.put('/:id', isAdmin, updateLesson);
-router.delete('/:id', isAdmin, deleteLesson);
+router.get("/", getLessons);
+router.get("/:id", getLessonById);
+router.post("/", isAdmin, createLesson);
+router.put("/:id", isAdmin, updateLesson);
+router.delete("/:id", isAdmin, deleteLesson);
 
-export default router; 
+export default router;
