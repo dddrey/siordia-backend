@@ -19,7 +19,7 @@ export const corsOptions: CorsOptions = {
     "http://localhost:5186",
     "http://localhost:5187",
     "http://localhost:5188",
-    "http://localhost:5189",
+    "https://graduated-disposition-effect-epa.trycloudflare.com",
     "https://jean-involvement-concentration-superb.trycloudflare.com",
   ],
   credentials: true,
