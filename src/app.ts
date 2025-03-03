@@ -11,8 +11,18 @@ import "express-async-errors";
 import { checkExpiredSubscriptions } from "./middleware/checkExpiredSubscriptions";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
+import cors from "cors";
+import { corsOptions } from "./config/cors.config";
+import statisticsRoutes from "./routes/statistics.routes";
 
 const app = express();
+
+app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -29,6 +39,7 @@ app.use("/folders", folderRoutes);
 app.use("/topics", topicRoutes);
 app.use("/lessons", lessonRoutes);
 app.use("/subscriptions", subscriptionRoutes);
+app.use("/statistics", statisticsRoutes);
 
 app.use(errorHandler);
 

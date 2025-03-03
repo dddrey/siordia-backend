@@ -19,7 +19,6 @@ export const parseInitDataMiddleware = (
 ): void => {
   try {
     const initData = req.headers["init-data"] as string;
-
     if (!initData) throw new Error("No initData provided");
 
     const decodedInitData = decodeURIComponent(initData);

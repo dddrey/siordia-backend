@@ -17,8 +17,8 @@ import {
 
 const router = Router();
 
-router.get("/", getFolders);
 router.get("/:id", getFolderById);
+router.get("/", getFolders);
 
 router.post("/", isAdmin, createFolder);
 router.put("/:id", isAdmin, updateFolder);
