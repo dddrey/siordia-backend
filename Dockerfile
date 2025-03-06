@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Копируем файлы зависимостей
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 # Копируем исходный код
 COPY . .
@@ -14,9 +14,6 @@ RUN npx prisma generate
 
 # Собираем TypeScript
 RUN npm run build
-
-# Убедимся, что все модули установлены для production
-RUN npm ci --only=production
 
 EXPOSE 4000
 
