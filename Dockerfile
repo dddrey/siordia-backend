@@ -18,4 +18,4 @@ RUN npm run build
 EXPOSE 4000
 
 # Используем команду для запуска собранного приложения
-CMD ["npm", "start"]
+CMD ["npm", "start:prod"]
