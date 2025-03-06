@@ -18,6 +18,7 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_config_1 = __importDefault(require("./config/swagger.config"));
 const cors_1 = __importDefault(require("cors"));
 const cors_config_1 = require("./config/cors.config");
+const statistics_routes_1 = __importDefault(require("./routes/statistics.routes"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)(cors_config_1.corsOptions));
 app.use((req, res, next) => {
@@ -34,5 +35,6 @@ app.use("/folders", folder_routes_1.default);
 app.use("/topics", topic_routes_1.default);
 app.use("/lessons", lesson_routes_1.default);
 app.use("/subscriptions", subscription_routes_1.default);
+app.use("/statistics", statistics_routes_1.default);
 app.use(errorHandler_1.errorHandler);
 exports.default = app;

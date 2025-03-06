@@ -8,7 +8,7 @@ const swaggerOptions = {
     swaggerDefinition: {
         openapi: "3.0.0",
         info: {
-            title: " SKILL UP IPI",
+            title: "SKILL UP IPI",
             version: "1.0.0",
         },
     },

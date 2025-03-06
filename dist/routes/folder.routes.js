@@ -10,9 +10,7 @@ const index_1 = require("../controllers/folders/index");
  *   description: Папки
  */
 const router = (0, express_1.Router)();
-// Важен порядок маршрутов!
-// Сначала конкретные маршруты
-router.get("/:id", index_1.getFolderById); // Этот маршрут должен быть после getFolders
+router.get("/:id", index_1.getFolderById);
 router.get("/", index_1.getFolders);
 router.post("/", isAdmin_1.isAdmin, index_1.createFolder);
 router.put("/:id", isAdmin_1.isAdmin, index_1.updateFolder);

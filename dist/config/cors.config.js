@@ -1,27 +1,16 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.corsOptions = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 exports.corsOptions = {
     origin: [
         "http://localhost:5172",
         "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://localhost:5178",
-        "http://localhost:5179",
-        "http://localhost:5180",
-        "http://localhost:5181",
-        "http://localhost:5182",
-        "http://localhost:5183",
-        "http://localhost:5184",
-        "http://localhost:5185",
-        "http://localhost:5186",
-        "http://localhost:5187",
-        "http://localhost:5188",
-        "http://localhost:5189",
-        "https://a2f4-185-220-204-42.ngrok-free.app",
+        process.env.FRONTEND_URL || "",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
@@ -33,6 +22,5 @@ exports.corsOptions = {
         "Origin",
         "init-data",
     ],
-    exposedHeaders: ["set-cookie"],
     maxAge: 86400,
 };
