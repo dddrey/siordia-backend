@@ -72,5 +72,6 @@ enum ContentType {
   player
   coach
   parent
+  school
 }
 

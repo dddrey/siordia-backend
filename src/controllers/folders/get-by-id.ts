@@ -6,7 +6,6 @@ import { prisma } from "@/prisma/prismaClient";
 export const getFolderById = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    console.log("Getting folder with ID:", id);
 
     const folder = await prisma.folder.findUnique({
       where: { id },
