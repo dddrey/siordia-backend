@@ -21,13 +21,12 @@ export class BotService {
           userId: payment.userId,
           paymentId: `pay_${Date.now()}_${payment.userId}`,
         }),
-
-        provider_token: process.env.PROVIDER_TOKEN!,
-        currency: "RUB",
+        provider_token: "",
+        currency: "XTR", // Используем STARS как валюту
         prices: [
           {
             label: "Подписка",
-            amount: payment.amount * 100,
+            amount: 1, // Количество звезд (не умножаем на 100)
           },
         ],
         start_parameter: "subscription_payment",
