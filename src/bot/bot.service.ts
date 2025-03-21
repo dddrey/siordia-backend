@@ -25,7 +25,7 @@ export class BotService {
         currency: "XTR",
         prices: [
           {
-            label: "Подписка 1",
+            label: "Подписка2",
             amount: 1,
           },
         ],
