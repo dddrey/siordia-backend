@@ -7,11 +7,13 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./*"]
     },
-    "types": ["express", "jest"]
+    "types": ["express", "jest"],
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

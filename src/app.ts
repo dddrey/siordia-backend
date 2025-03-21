@@ -1,6 +1,5 @@
 import express from "express";
 import { parseInitDataMiddleware } from "./middleware/parseInitData";
-import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middleware/errorHandler";
 import folderRoutes from "./routes/folder.routes";
 import { authMiddleware } from "./middleware/authMiddleware";
@@ -12,6 +11,7 @@ import { checkExpiredSubscriptions } from "./middleware/checkExpiredSubscription
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
 import statisticsRoutes from "./routes/statistics.routes";
+import { authenticateUser } from "./controllers/auth/authenticate";
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use(express.json());
 
 app.use(parseInitDataMiddleware);
 
-app.use("/auth", authRoutes);
+app.use("/auth", authenticateUser);
 
 app.use(authMiddleware);
 app.use(checkExpiredSubscriptions);

@@ -47,6 +47,6 @@
     "typescript": "^5.7.2"
   },
   "_moduleAliases": {
-    "@": "dist"
+    "@": "src"
   }
 }
