@@ -22,11 +22,11 @@ export class BotService {
           paymentId: `pay_${Date.now()}_${payment.userId}`,
         }),
         provider_token: "",
-        currency: "XTR", // Используем STARS как валюту
+        currency: "XTR",
         prices: [
           {
             label: "Подписка",
-            amount: 1, // Количество звезд (не умножаем на 100)
+            amount: 1,
           },
         ],
         start_parameter: "subscription_payment",
