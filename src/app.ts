@@ -11,13 +11,9 @@ import "express-async-errors";
 import { checkExpiredSubscriptions } from "./middleware/checkExpiredSubscriptions";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
-import cors from "cors";
-import { corsOptions } from "./config/cors.config";
 import statisticsRoutes from "./routes/statistics.routes";
 
 const app = express();
-
-app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
