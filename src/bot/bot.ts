@@ -1,5 +1,6 @@
 import { Bot, Context } from "grammy";
 import dotenv from "dotenv";
+import { ContentType } from "@prisma/client";
 dotenv.config();
 
 class BotService {
@@ -44,10 +45,18 @@ class BotService {
     this.bot.start();
   }
 
-  public async createInvoiceLink() {
+  public async createInvoiceLink({
+    title,
+    description,
+    type,
+  }: {
+    title: string;
+    description: string;
+    type: ContentType;
+  }) {
     const invoice = {
-      title: "Some Title",
-      description: "Some Description",
+      title,
+      description,
       payload: JSON.stringify({
         subscription_period: "yearly",
       }),
@@ -59,7 +68,7 @@ class BotService {
           amount: 1,
         },
       ],
-      subscription_period: 2592000,
+      type,
     };
 
     try {
