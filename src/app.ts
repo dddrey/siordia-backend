@@ -12,10 +12,10 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
 import statisticsRoutes from "./routes/statistics.routes";
 import { authenticateUser } from "./controllers/auth/authenticate";
-import { TelegramBot } from "./bot/bot";
+import BotService from "./bot/bot";
 
 const app = express();
-export const bot = new TelegramBot();
+export const bot = BotService.getInstance().start();
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
@@ -40,12 +40,5 @@ app.use("/subscriptions", subscriptionRoutes);
 app.use("/statistics", statisticsRoutes);
 
 app.use(errorHandler);
-
-bot.start().catch((error) => {
-  console.error("Failed to start Telegram bot:", error);
-});
-
-process.once("SIGINT", () => bot.stop());
-process.once("SIGTERM", () => bot.stop());
 
 export default app;
