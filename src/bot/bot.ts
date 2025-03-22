@@ -63,7 +63,7 @@ class BotService {
         ctx.update.message?.successful_payment.is_recurring
       );
       // ctx.editUserStarSubscription(ctx.update.message?.successful_payment.is_recurring)
-      ctx.refundStarPayment();
+      // ctx.refundStarPayment();
     });
   }
 
