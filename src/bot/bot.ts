@@ -29,41 +29,14 @@ class BotService {
 
       const payload = JSON.parse(query.invoice_payload);
 
-      const { subscription_period } = payload;
-      console.log("subscription_period: ", subscription_period);
+      console.log("payload: ", payload);
 
-      if (subscription_period) {
-        switch (subscription_period) {
-          case "yearly":
-            // Database actions
-            // userModel.activateSubscription(userid, subscription_period, DB)
-            await ctx.answerPreCheckoutQuery(true);
-            break;
-          case "monthly":
-            // Database actions
-            // userModel.activateSubscription(userid, subscription_period, DB)
-            await ctx.answerPreCheckoutQuery(true);
-            break;
-        }
-      }
-      await ctx.answerPreCheckoutQuery(
-        false,
-        "Выбран несуществующий период подписки"
-      );
+      await ctx.answerPreCheckoutQuery(true);
     });
 
     this.bot.on(":successful_payment", async (ctx) => {
-      ctx.reply("Вы получили Pro версию");
-      console.log(
-        "successful_payment: ",
-        ctx.update.message?.successful_payment
-      );
-      console.log(
-        "is reccuring: ",
-        ctx.update.message?.successful_payment.is_recurring
-      );
       // ctx.editUserStarSubscription(ctx.update.message?.successful_payment.is_recurring)
-      // ctx.refundStarPayment();
+      ctx.refundStarPayment();
     });
   }
 
