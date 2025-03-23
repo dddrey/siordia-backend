@@ -1,5 +1,5 @@
 import { PrismaClient, ContentType, Subscription } from "@prisma/client";
-import { addMonths, isAfter } from "date-fns";
+import { addMonths } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -25,6 +25,7 @@ export const createOrUpdateSubscription = async (
       where: {
         userId,
         type,
+        active: true,
       },
     });
 
@@ -33,20 +34,9 @@ export const createOrUpdateSubscription = async (
     const now = new Date();
 
     if (existingSubscription) {
-      const currentEndDate = new Date(existingSubscription.endDate);
-      console.log("Current endDate:", currentEndDate);
-      console.log("Current date:", now);
+      console.log("Subscription active, extending from current end date");
 
-      let newEndDate: Date;
-
-      // Если текущая дата больше даты окончания подписки
-      if (isAfter(now, currentEndDate)) {
-        console.log("Subscription expired, starting from current date");
-        newEndDate = addMonths(now, 1);
-      } else {
-        console.log("Subscription active, extending from current end date");
-        newEndDate = addMonths(currentEndDate, 1);
-      }
+      const newEndDate = addMonths(now, 1);
 
       console.log("New endDate will be:", newEndDate);
 
@@ -55,8 +45,6 @@ export const createOrUpdateSubscription = async (
         data: {
           endDate: newEndDate,
           active: true,
-          // Обновляем startDate только если подписка истекла
-          ...(isAfter(now, currentEndDate) && { startDate: now }),
         },
       });
 
@@ -64,13 +52,12 @@ export const createOrUpdateSubscription = async (
       return updatedSubscription;
     }
 
-    // Создаем новую подписку
+    // Если подписки нет, создаем новую
     console.log("Creating new subscription from:", now);
     const newSubscription = await prisma.subscription.create({
       data: {
         userId,
         type,
-        startDate: now,
         endDate: addMonths(now, 1),
         active: true,
       },
