@@ -12,7 +12,6 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
 import statisticsRoutes from "./routes/statistics.routes";
 import { authenticateUser } from "./controllers/auth/authenticate";
-import bot from "./bot";
 
 const app = express();
 app.use((req, res, next) => {
@@ -38,7 +37,5 @@ app.use("/subscriptions", subscriptionRoutes);
 app.use("/statistics", statisticsRoutes);
 
 app.use(errorHandler);
-
-bot.start();
 
 export default app;
