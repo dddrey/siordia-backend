@@ -21,6 +21,7 @@ bot.on(":successful_payment", async (ctx) => {
       await createSubscription(parsedData.type, ctx.from?.id.toString());
     } catch (error) {
       console.error("Error creating subscription:", error);
+      ctx.reply("Произошла ошибка при создании подписки");
     }
   }
   ctx.refundStarPayment();
