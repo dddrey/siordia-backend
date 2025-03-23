@@ -7,15 +7,19 @@ export const createOrUpdateSubscription = async (
   userId?: string,
   type?: ContentType
 ): Promise<Subscription> => {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  if (!type) {
+    throw new Error("Type is required");
+  }
+
+  if (!Object.values(ContentType).includes(type as ContentType)) {
+    throw new Error("Invalid type");
+  }
+
   try {
-    if (!userId) {
-      throw new Error("User ID is required");
-    }
-
-    if (!type) {
-      throw new Error("Type is required");
-    }
-
     console.log(
       `Attempting to handle subscription for user ${userId}, type: ${type}`
     );
@@ -25,7 +29,6 @@ export const createOrUpdateSubscription = async (
       where: {
         userId,
         type,
-        active: true,
       },
     });
 
@@ -33,13 +36,10 @@ export const createOrUpdateSubscription = async (
 
     if (existingSubscription) {
       console.log("Current endDate:", existingSubscription.endDate);
-      // Проверяем, не истекла ли подписка
-      const now = new Date();
-      const currentEndDate = new Date(existingSubscription.endDate);
-
-      // Если подписка истекла, начинаем с текущей даты
-      const baseDate = currentEndDate < now ? now : currentEndDate;
-      const newEndDate = addMonths(baseDate, 1);
+      // Если подписка существует, продлеваем её
+      const newEndDate = existingSubscription.active
+        ? addMonths(new Date(existingSubscription.endDate), 1) // Явно преобразуем в Date
+        : addMonths(new Date(), 1);
 
       console.log("New endDate will be:", newEndDate);
 
