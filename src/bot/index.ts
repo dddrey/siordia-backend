@@ -1,5 +1,6 @@
 import { Bot } from "grammy";
 import dotenv from "dotenv";
+import { prisma } from "@/prisma/prismaClient";
 
 dotenv.config();
 
@@ -11,12 +12,9 @@ bot.on("pre_checkout_query", async (ctx) => {
 });
 
 bot.on(":successful_payment", async (ctx) => {
-  console.log("Payment successful:", ctx.message?.successful_payment);
-});
-
-bot.on("message", async (ctx) => {
-  console.log("Message:", ctx.message);
-  await ctx.reply("Payment successful!");
+  ctx.reply("Вы получили Pro версию");
+  console.log("successful_payment: ", ctx.update);
+  ctx.refundStarPayment();
 });
 
 export default bot;

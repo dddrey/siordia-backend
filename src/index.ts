@@ -7,8 +7,7 @@ dotenv.config();
 
 const PORT = Number(process.env.PORT) || 4000;
 
-bot.start();
-
 app.listen(PORT, "0.0.0.0", () => {
+  bot.start();
   console.log(`Server is running on http://localhost:${PORT}`);
 });
