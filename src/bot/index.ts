@@ -1,6 +1,6 @@
 import { Bot } from "grammy";
 import dotenv from "dotenv";
-
+import { createSubscription } from "./create.sub";
 dotenv.config();
 
 const bot = new Bot(process.env.BOT_TOKEN!);
@@ -17,7 +17,11 @@ bot.on(":successful_payment", async (ctx) => {
     const parsedData = JSON.parse(
       ctx.update.message?.successful_payment.invoice_payload
     );
-    ctx.reply(parsedData.type);
+    try {
+      await createSubscription(parsedData.type, ctx.from?.id.toString());
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+    }
   }
   ctx.refundStarPayment();
 });
