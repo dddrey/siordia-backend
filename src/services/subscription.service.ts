@@ -35,24 +35,29 @@ export const createOrUpdateSubscription = async (
     console.log("Existing subscription:", existingSubscription);
 
     if (existingSubscription) {
-      console.log("Current endDate:", existingSubscription.endDate);
-      // Если подписка существует, продлеваем её
-      const newEndDate = existingSubscription.active
-        ? addMonths(new Date(existingSubscription.endDate), 1) // Явно преобразуем в Date
-        : addMonths(new Date(), 1);
+      // Всегда создаем новую подписку вместо обновления существующей
+      const now = new Date();
+      const newEndDate = addMonths(now, 1);
 
-      console.log("New endDate will be:", newEndDate);
-
-      const updatedSubscription = await prisma.subscription.update({
+      // Деактивируем старую подписку
+      await prisma.subscription.update({
         where: { id: existingSubscription.id },
+        data: { active: false },
+      });
+
+      // Создаем новую подписку
+      const newSubscription = await prisma.subscription.create({
         data: {
+          userId,
+          type,
+          startDate: now,
           endDate: newEndDate,
           active: true,
         },
       });
 
-      console.log("Updated subscription:", updatedSubscription);
-      return updatedSubscription;
+      console.log("Created new subscription:", newSubscription);
+      return newSubscription;
     }
 
     // Если подписки нет, создаем новую
