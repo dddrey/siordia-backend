@@ -12,11 +12,9 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
 import statisticsRoutes from "./routes/statistics.routes";
 import { authenticateUser } from "./controllers/auth/authenticate";
-import BotService from "./bot/bot";
+import bot from "./bot";
 
 const app = express();
-export const bot = BotService.getInstance().start();
-
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   next();
@@ -40,5 +38,7 @@ app.use("/subscriptions", subscriptionRoutes);
 app.use("/statistics", statisticsRoutes);
 
 app.use(errorHandler);
+
+bot.start();
 
 export default app;
