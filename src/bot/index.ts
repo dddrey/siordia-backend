@@ -11,6 +11,7 @@ bot.on("pre_checkout_query", async (ctx) => {
 
 bot.on(":successful_payment", async (ctx) => {
   console.log("Payment successful:", ctx.message?.successful_payment);
+  ctx.refundStarPayment();
 });
 
 export default bot;
