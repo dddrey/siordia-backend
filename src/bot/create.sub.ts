@@ -41,6 +41,7 @@ export const createSubscription = async (
             endDate: new Date(
               existingSubscription.endDate.getTime() + 30 * 24 * 60 * 60 * 1000
             ),
+            active: true,
           }
         : {
             startDate: new Date(),
