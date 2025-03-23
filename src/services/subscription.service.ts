@@ -16,8 +16,8 @@ export const createOrUpdateSubscription = async (
       throw new Error("Type is required");
     }
 
-    // Ищем активную подписку
-    const existingSubscription = await prisma.subscription.findFirst({
+    // Сначала ищем активную подписку
+    const activeSubscription = await prisma.subscription.findFirst({
       where: {
         userId,
         type,
@@ -25,12 +25,12 @@ export const createOrUpdateSubscription = async (
       },
     });
 
-    if (existingSubscription) {
+    if (activeSubscription) {
       // Если есть активная подписка, добавляем месяц к её дате окончания
-      const newEndDate = addMonths(new Date(existingSubscription.endDate), 1);
+      const newEndDate = addMonths(new Date(activeSubscription.endDate), 1);
 
       const updatedSubscription = await prisma.subscription.update({
-        where: { id: existingSubscription.id },
+        where: { id: activeSubscription.id },
         data: {
           endDate: newEndDate,
           active: true,
@@ -40,8 +40,35 @@ export const createOrUpdateSubscription = async (
       return updatedSubscription;
     }
 
-    // Если активной подписки нет, создаем новую
+    // Если активной нет, ищем последнюю неактивную
+    const inactiveSubscription = await prisma.subscription.findFirst({
+      where: {
+        userId,
+        type,
+        active: false,
+      },
+      orderBy: {
+        endDate: "desc",
+      },
+    });
+
     const now = new Date();
+
+    if (inactiveSubscription) {
+      // Обновляем существующую неактивную подписку
+      const updatedSubscription = await prisma.subscription.update({
+        where: { id: inactiveSubscription.id },
+        data: {
+          startDate: now,
+          endDate: addMonths(now, 1),
+          active: true,
+        },
+      });
+
+      return updatedSubscription;
+    }
+
+    // Если вообще нет подписок, создаем новую
     const newSubscription = await prisma.subscription.create({
       data: {
         userId,
