@@ -16,10 +16,6 @@ export const createOrUpdateSubscription = async (
       throw new Error("Type is required");
     }
 
-    if (!Object.values(ContentType).includes(type as ContentType)) {
-      throw new Error("Invalid type");
-    }
-
     console.log(
       `Attempting to handle subscription for user ${userId}, type: ${type}`
     );
@@ -29,35 +25,34 @@ export const createOrUpdateSubscription = async (
       where: {
         userId,
         type,
+        active: true,
       },
     });
 
     console.log("Existing subscription:", existingSubscription);
 
     if (existingSubscription) {
-      // Всегда создаем новую подписку вместо обновления существующей
+      console.log("Current endDate:", existingSubscription.endDate);
+      // Проверяем, не истекла ли подписка
       const now = new Date();
-      const newEndDate = addMonths(now, 1);
+      const currentEndDate = new Date(existingSubscription.endDate);
 
-      // Деактивируем старую подписку
-      await prisma.subscription.update({
+      // Если подписка истекла, начинаем с текущей даты
+      const baseDate = currentEndDate < now ? now : currentEndDate;
+      const newEndDate = addMonths(baseDate, 1);
+
+      console.log("New endDate will be:", newEndDate);
+
+      const updatedSubscription = await prisma.subscription.update({
         where: { id: existingSubscription.id },
-        data: { active: false },
-      });
-
-      // Создаем новую подписку
-      const newSubscription = await prisma.subscription.create({
         data: {
-          userId,
-          type,
-          startDate: now,
           endDate: newEndDate,
           active: true,
         },
       });
 
-      console.log("Created new subscription:", newSubscription);
-      return newSubscription;
+      console.log("Updated subscription:", updatedSubscription);
+      return updatedSubscription;
     }
 
     // Если подписки нет, создаем новую
