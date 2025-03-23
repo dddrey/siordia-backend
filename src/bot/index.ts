@@ -1,6 +1,7 @@
 import { Bot } from "grammy";
 import dotenv from "dotenv";
-import { createSubscription } from "./create.sub";
+import { createOrUpdateSubscription } from "@/services/subscription.service";
+
 dotenv.config();
 
 const bot = new Bot(process.env.BOT_TOKEN!);
@@ -18,7 +19,10 @@ bot.on(":successful_payment", async (ctx) => {
       ctx.update.message?.successful_payment.invoice_payload
     );
     try {
-      await createSubscription(parsedData.type, ctx.from?.id.toString());
+      await createOrUpdateSubscription(
+        ctx.from?.id.toString(),
+        parsedData.type
+      );
     } catch (error) {
       console.error("Error creating subscription:", error);
       ctx.reply("Произошла ошибка при создании подписки");
