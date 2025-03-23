@@ -1,12 +1,11 @@
-import { PrismaClient, ContentType, Subscription } from "@prisma/client";
-import { addMonths } from "date-fns";
+import { PrismaClient, ContentType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export const createOrUpdateSubscription = async (
   userId?: string,
   type?: ContentType
-): Promise<Subscription> => {
+) => {
   try {
     if (!userId) {
       throw new Error("User ID is required");
