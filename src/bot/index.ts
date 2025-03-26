@@ -1,10 +1,34 @@
 import { Bot } from "grammy";
 import dotenv from "dotenv";
 import { createOrUpdateSubscription } from "@/services/subscription.service";
-
+import { startText, helpText, aboutText } from "./text";
 dotenv.config();
 
 const bot = new Bot(process.env.BOT_TOKEN!);
+
+bot.command("start", async (ctx) => {
+  await ctx.reply(startText, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "App", web_app: { url: process.env.APP_URL! } }],
+      ],
+    },
+  });
+});
+
+bot.command("help", async (ctx) => {
+  await ctx.reply(helpText);
+});
+
+bot.command("about", async (ctx) => {
+  await ctx.reply(aboutText, {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "App", web_app: { url: process.env.APP_URL! } }],
+      ],
+    },
+  });
+});
 
 bot.on("pre_checkout_query", async (ctx) => {
   console.log("Pre checkout query:", ctx.message);

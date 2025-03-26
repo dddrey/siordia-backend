@@ -1,62 +1,43 @@
 import { asyncHandler } from "@/middleware/asyncHandler";
-import { NotFoundError } from "@/utils/errors/AppError";
 import { ValidationError } from "@/utils/errors/AppError";
-import { prisma } from "@/prisma/prismaClient";
 import { Request, Response } from "express";
+import multer from "multer";
+
+// Настраиваем multer для временного хранения в памяти
+const upload = multer();
 
 export const createLesson = asyncHandler(
   async (req: Request, res: Response) => {
-    const {
-      name,
-      video,
-      about,
-      description,
-      tasks,
-      isSubscriptionRequired,
-      topicId,
-    } = req.body;
+    // Оборачиваем в Promise для использования с asyncHandler
+    await new Promise((resolve, reject) => {
+      upload.single("video")(req, res, (err) => {
+        if (err) reject(err);
+        resolve(true);
+      });
+    });
 
-    if (!name || !video || !topicId) {
-      throw new ValidationError("Name, video and topicId are required");
+    console.log("Form fields:", req.body); // Все текстовые поля
+    console.log("File details:", req.file); // Информация о файле
+
+    const { name, about, description, tasks, isSubscriptionRequired, topicId } =
+      req.body;
+
+    console.log("Parsed fields:");
+    console.log("name:", name);
+    console.log("about:", about);
+    console.log("description:", description);
+    console.log("tasks:", tasks);
+    console.log("isSubscriptionRequired:", isSubscriptionRequired);
+    console.log("topicId:", topicId);
+    console.log("File:", req.file);
+
+    if (!name || !topicId || !req.file) {
+      throw new ValidationError("Name and topicId are required");
     }
 
-    const topic = await prisma.topic.findUnique({
-      where: { id: topicId },
-      include: { folder: true },
+    res.status(201).json({
+      success: true,
+      data: {},
     });
-
-    if (!topic) {
-      throw new NotFoundError("Topic not found");
-    }
-
-    const lastLesson = await prisma.lesson.findFirst({
-      where: { topicId },
-      orderBy: { orderNumber: "desc" },
-    });
-
-    const nextOrderNumber = (lastLesson?.orderNumber || 0) + 1;
-
-    const lesson = await prisma.lesson.create({
-      data: {
-        name,
-        video,
-        about,
-        description,
-        tasks: tasks || [],
-        orderNumber: nextOrderNumber,
-        isSubscriptionRequired: isSubscriptionRequired ?? true,
-        type: topic.folder.type,
-        topicId,
-      },
-      include: {
-        topic: {
-          include: {
-            folder: true,
-          },
-        },
-      },
-    });
-
-    res.status(201).json(lesson);
   }
 );

@@ -11,9 +11,10 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["express", "jest"],
+    "types": ["express", "jest", "node"],
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

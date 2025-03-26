@@ -23,6 +23,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
 app.use(parseInitDataMiddleware);
 
 app.use("/auth", authenticateUser);

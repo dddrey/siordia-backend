@@ -54,7 +54,7 @@ model Topic {
 model Lesson {
   id                     String      @id @default(cuid())
   name                   String
-  video                  String
+  videoId                String
   about                  String?
   description            String?
   tasks                  Json[]
@@ -66,6 +66,17 @@ model Lesson {
   updatedAt              DateTime    @updatedAt
   type                   ContentType
   topic                  Topic       @relation(fields: [topicId], references: [id])
+  video                  Video      @relation(fields: [videoId], references: [id]) // Реляция с Video
+}
+
+model Video {
+  id          String     @id @default(cuid())  // Уникальный идентификатор
+  fileName    String     // Имя файла
+  fileUrl     String     // URL для доступа к файлу
+  fileId      String     // Уникальный идентификатор файла в B2
+  contentType String     // Тип контента, например video/quicktime
+  uploadTimestamp DateTime // Время загрузки файла
+  lessons     Lesson[]   // Видео может быть связано с несколькими уроками (реляция)
 }
 
 enum ContentType {
