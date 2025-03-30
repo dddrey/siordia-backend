@@ -12,6 +12,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.config";
 import statisticsRoutes from "./routes/statistics.routes";
 import { authenticateUser } from "./controllers/auth/authenticate";
+import fileRoutes from "./controllers/auth/fileRoutes";
 
 const app = express();
 app.use((req, res, next) => {
@@ -31,6 +32,7 @@ app.use("/auth", authenticateUser);
 app.use(authMiddleware);
 app.use(checkExpiredSubscriptions);
 
+app.use("/", fileRoutes);
 app.use("/folders", folderRoutes);
 app.use("/topics", topicRoutes);
 app.use("/lessons", lessonRoutes);

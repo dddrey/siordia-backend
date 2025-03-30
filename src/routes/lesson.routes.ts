@@ -7,8 +7,8 @@ import {
   createLesson,
   updateLesson,
   deleteLesson,
+  getLessonVideoUrl,
 } from "@/controllers/lessons/index";
-
 const router = Router();
 
 /**
@@ -23,5 +23,7 @@ router.get("/:id", getLessonById);
 router.post("/", isAdmin, createLesson);
 router.put("/:id", isAdmin, updateLesson);
 router.delete("/:id", isAdmin, deleteLesson);
+
+router.get("/:id/video-url", getLessonVideoUrl);
 
 export default router;

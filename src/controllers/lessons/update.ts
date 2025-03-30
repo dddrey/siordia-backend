@@ -2,13 +2,13 @@ import { asyncHandler } from "@/middleware/asyncHandler";
 import { NotFoundError } from "@/utils/errors/AppError";
 import { prisma } from "@/prisma/prismaClient";
 import { Request, Response } from "express";
+import { uploadFile, deleteFile } from "@/services/uploader.service";
 
 export const updateLesson = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
     const {
       name,
-      video,
       about,
       description,
       tasks,
@@ -17,9 +17,15 @@ export const updateLesson = asyncHandler(
       topicId,
     } = req.body;
 
+    console.log(typeof isSubscriptionRequired, isSubscriptionRequired);
+    const isSubscriptionRequiredBool = isSubscriptionRequired === "true";
+    console.log(typeof isSubscriptionRequiredBool, isSubscriptionRequiredBool);
+
     const existingLesson = await prisma.lesson.findUnique({
       where: { id },
-      include: { topic: { include: { folder: true } } },
+      include: {
+        topic: { include: { folder: true } },
+      },
     });
 
     if (!existingLesson) {
@@ -41,20 +47,56 @@ export const updateLesson = asyncHandler(
       type = newTopic.folder.type;
     }
 
+    // Обрабатываем видео только если пришел новый файл
+    if (req.file) {
+      // Удаляем старое видео из storage
+      await deleteFile(existingLesson.videoId);
+
+      // Загружаем новое видео и получаем новый videoId
+      const newVideoId = await uploadFile(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype
+      );
+
+      // Обновляем урок с новым videoId
+      const updatedLesson = await prisma.lesson.update({
+        where: { id },
+        data: {
+          name,
+          about,
+          description,
+          tasks,
+          isSubscriptionRequired: isSubscriptionRequiredBool,
+          orderNumber,
+          topicId,
+          type,
+          videoId: newVideoId,
+        },
+        include: {
+          topic: { include: { folder: true } },
+        },
+      });
+
+      return res.json(updatedLesson);
+    }
+
+    // Если новый файл не пришел, обновляем урок без изменения videoId
     const updatedLesson = await prisma.lesson.update({
       where: { id },
       data: {
         name,
-        video,
         about,
         description,
         tasks,
-        isSubscriptionRequired,
+        isSubscriptionRequired: isSubscriptionRequiredBool,
         orderNumber,
         topicId,
         type,
       },
-      include: { topic: { include: { folder: true } } },
+      include: {
+        topic: { include: { folder: true } },
+      },
     });
 
     res.json(updatedLesson);
