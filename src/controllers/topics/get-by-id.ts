@@ -38,8 +38,20 @@ export const getTopicById = asyncHandler(
 
     const isHavePermission = hasActiveSubscription(req, topic.type);
 
+    const topicWithLessons = {
+      ...topic,
+      lessons: [
+        ...topic.lessons.filter(
+          (lesson) => lesson.isSubscriptionRequired === false
+        ),
+        ...topic.lessons.filter(
+          (lesson) => lesson.isSubscriptionRequired === true
+        ),
+      ],
+    };
+
     res.json({
-      topic: topic,
+      topic: topicWithLessons,
       isHavePermission: isHavePermission,
     });
   }
