@@ -11,16 +11,16 @@ export const createPayment = asyncHandler(
 
     switch (type) {
       case ContentType.player:
-        title = "Оплатить подписку для игрока";
+        title = "подписку для игрока на 1 месяц";
         break;
       case ContentType.coach:
-        title = "Оплатить подписку для тренера";
+        title = "подписку для тренера на 1 месяц";
         break;
       case ContentType.parent:
-        title = "Оплатить подписку для родителя";
+        title = "подписку для родителя на 1 месяц";
         break;
       default:
-        title = "Оплатить подписку на 1 месяц";
+        title = "подписку на 1 месяц";
     }
 
     const invoice = {
