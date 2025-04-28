@@ -14,7 +14,7 @@ export const getLessons = asyncHandler(async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { orderNumber: "asc" },
+      orderBy: { isSubscriptionRequired: "asc", orderNumber: "asc" },
     });
     res.json(lessons);
   } else {
@@ -27,7 +27,7 @@ export const getLessons = asyncHandler(async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { orderNumber: "asc" },
+      orderBy: { isSubscriptionRequired: "asc", orderNumber: "asc" },
     });
     res.json(lessons);
   }

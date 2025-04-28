@@ -66,6 +66,8 @@ model Lesson {
   updatedAt              DateTime    @updatedAt
   type                   ContentType
   topic                  Topic       @relation(fields: [topicId], references: [id])
+
+  @@index([isSubscriptionRequired, orderNumber])
 }
 
 enum ContentType {
