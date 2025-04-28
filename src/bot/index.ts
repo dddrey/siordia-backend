@@ -31,7 +31,6 @@ bot.command("about", async (ctx) => {
 });
 
 bot.on("pre_checkout_query", async (ctx) => {
-  console.log("Pre checkout query:", ctx.message);
   await ctx.answerPreCheckoutQuery(true);
 });
 
@@ -51,7 +50,6 @@ bot.on(":successful_payment", async (ctx) => {
       ctx.reply("Произошла ошибка при создании подписки");
     }
   }
-  ctx.refundStarPayment();
 });
 
 export default bot;

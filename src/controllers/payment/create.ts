@@ -7,9 +7,25 @@ export const createPayment = asyncHandler(
   async (req: Request, res: Response) => {
     const { type } = req.body;
 
+    let title;
+
+    switch (type) {
+      case ContentType.player:
+        title = "Оплатить подписку для игрока";
+        break;
+      case ContentType.coach:
+        title = "Оплатить подписку для тренера";
+        break;
+      case ContentType.parent:
+        title = "Оплатить подписку для родителя";
+        break;
+      default:
+        title = "Оплатить подписку на 1 месяц";
+    }
+
     const invoice = {
-      title: "Upgrade to Pro",
-      description: "Upgrade to Pro",
+      title,
+      description: "Оплатить подписку на 1 месяц",
       payload: JSON.stringify({
         type,
         timestamp: Date.now(),
@@ -18,8 +34,8 @@ export const createPayment = asyncHandler(
       currency: "XTR",
       prices: [
         {
-          label: "Upgrade to Pro",
-          amount: 1,
+          label: "цена за 1 месяц",
+          amount: 1200,
         },
       ],
     };
