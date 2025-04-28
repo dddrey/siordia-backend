@@ -29,6 +29,6 @@ export const getLessons = asyncHandler(async (req: Request, res: Response) => {
       },
       orderBy: { isSubscriptionRequired: "asc", orderNumber: "asc" },
     });
-    res.json(lessons);
+    res.json(lessons.filter((lesson) => lesson.isSubscriptionRequired));
   }
 });
