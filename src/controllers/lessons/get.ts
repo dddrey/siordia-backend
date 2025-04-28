@@ -14,7 +14,7 @@ export const getLessons = asyncHandler(async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { isSubscriptionRequired: "asc", orderNumber: "asc" },
+      orderBy: { orderNumber: "asc" },
     });
     res.json(lessons);
   } else {
@@ -27,8 +27,11 @@ export const getLessons = asyncHandler(async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { isSubscriptionRequired: "asc", orderNumber: "asc" },
+      orderBy: { orderNumber: "asc" },
     });
-    res.json(lessons.filter((lesson) => lesson.isSubscriptionRequired));
+    res.json([
+      ...lessons.filter((lesson) => lesson.isSubscriptionRequired === true),
+      ...lessons.filter((lesson) => lesson.isSubscriptionRequired === false),
+    ]);
   }
 });
