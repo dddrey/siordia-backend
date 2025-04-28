@@ -30,29 +30,10 @@ export const getLessonById = asyncHandler(
       data: { views: currentLesson.views + 1 },
     });
 
-    const [previousLesson, nextLesson] = await Promise.all([
-      prisma.lesson.findFirst({
-        where: {
-          topicId: currentLesson.topicId,
-          orderNumber: { lt: currentLesson.orderNumber },
-        },
-        orderBy: { orderNumber: "desc" },
-        select: { id: true },
-      }),
-      prisma.lesson.findFirst({
-        where: {
-          topicId: currentLesson.topicId,
-          orderNumber: { gt: currentLesson.orderNumber },
-        },
-        orderBy: { orderNumber: "asc" },
-        select: { id: true },
-      }),
-    ]);
-
     res.json({
       lesson: currentLesson,
-      previousLessonId: previousLesson?.id || null,
-      nextLessonId: nextLesson?.id || null,
+      previousLessonId: null,
+      nextLessonId: null,
     });
   }
 );
