@@ -1,5 +1,5 @@
 import { PrismaClient, ContentType, Subscription } from "@prisma/client";
-import { addMonths } from "date-fns";
+import { addMinutes } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -26,8 +26,7 @@ export const createOrUpdateSubscription = async (
     });
 
     if (activeSubscription) {
-      // Если есть активная подписка, добавляем месяц к её дате окончания
-      const newEndDate = addMonths(new Date(activeSubscription.endDate), 1);
+      const newEndDate = addMinutes(new Date(activeSubscription.endDate), 1);
 
       const updatedSubscription = await prisma.subscription.update({
         where: { id: activeSubscription.id },
@@ -55,12 +54,11 @@ export const createOrUpdateSubscription = async (
     const now = new Date();
 
     if (inactiveSubscription) {
-      // Обновляем существующую неактивную подписку
       const updatedSubscription = await prisma.subscription.update({
         where: { id: inactiveSubscription.id },
         data: {
           startDate: now,
-          endDate: addMonths(now, 1),
+          endDate: addMinutes(now, 1),
           active: true,
         },
       });
@@ -73,7 +71,7 @@ export const createOrUpdateSubscription = async (
       data: {
         userId,
         type,
-        endDate: addMonths(now, 1),
+        endDate: addMinutes(now, 1),
         active: true,
       },
     });
