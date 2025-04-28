@@ -16,8 +16,11 @@ export const checkExpiredSubscriptions = async (
 
   const currentDate = new Date();
 
+  // Проходимся по подпискам пользователя
   for (const subscription of subscriptions) {
+    // Проверяем, если дата окончания подписки меньше текущей даты и подписка активна
     if (new Date(subscription.endDate) < currentDate && subscription.active) {
+      // Обновляем подписку, устанавливая её как неактивную
       await prisma.subscription.update({
         where: { id: subscription.id },
         data: {
@@ -27,5 +30,6 @@ export const checkExpiredSubscriptions = async (
     }
   }
 
+  // Продолжаем выполнение следующего мидлвара или маршрута
   next();
 };
