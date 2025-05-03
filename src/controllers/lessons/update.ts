@@ -88,7 +88,7 @@ export const updateLesson = asyncHandler(
         name,
         about,
         description,
-        tasks,
+        tasks: parsedTasks,
         isSubscriptionRequired: isSubscriptionRequiredBool,
         orderNumber,
         topicId,
