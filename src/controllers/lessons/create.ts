@@ -22,9 +22,8 @@ export const createLesson = asyncHandler(
     const { name, about, description, tasks, isSubscriptionRequired, topicId } =
       req.body;
 
-    const parsedTasks = tasks ? JSON.parse(tasks) : [];
+    console.log(typeof tasks);
 
-    console.log(typeof isSubscriptionRequired, isSubscriptionRequired);
     const isSubscriptionRequiredBool = isSubscriptionRequired === "true";
 
     if (!name || !topicId || !req.file) {
@@ -65,7 +64,7 @@ export const createLesson = asyncHandler(
         name,
         about,
         description,
-        tasks: parsedTasks,
+        tasks,
         isSubscriptionRequired: isSubscriptionRequiredBool,
         topicId,
         videoId: key,
