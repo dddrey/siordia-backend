@@ -17,6 +17,8 @@ export const updateLesson = asyncHandler(
       topicId,
     } = req.body;
 
+    console.log(typeof tasks);
+
     const isSubscriptionRequiredBool = isSubscriptionRequired === "true";
 
     const existingLesson = await prisma.lesson.findUnique({
@@ -45,8 +47,6 @@ export const updateLesson = asyncHandler(
       type = newTopic.folder.type;
     }
 
-    const parsedTasks = tasks ? JSON.parse(tasks) : [];
-
     // Обрабатываем видео только если пришел новый файл
     if (req.file) {
       // Удаляем старое видео из storage
@@ -66,7 +66,7 @@ export const updateLesson = asyncHandler(
           name,
           about,
           description,
-          tasks: parsedTasks,
+          tasks,
           isSubscriptionRequired: isSubscriptionRequiredBool,
           orderNumber,
           topicId,
@@ -88,7 +88,7 @@ export const updateLesson = asyncHandler(
         name,
         about,
         description,
-        tasks: parsedTasks,
+        tasks,
         isSubscriptionRequired: isSubscriptionRequiredBool,
         orderNumber,
         topicId,
