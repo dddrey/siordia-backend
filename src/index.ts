@@ -2,7 +2,7 @@ import "./paths";
 import "module-alias/register";
 import app from "./app";
 import dotenv from "dotenv";
-import bot from "./bot";
+import bot from "./bot/core";
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 4000;

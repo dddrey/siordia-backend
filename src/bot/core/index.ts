@@ -1,10 +1,20 @@
 import { Bot } from "grammy";
 import dotenv from "dotenv";
 import { createOrUpdateSubscription } from "@/services/subscription.service";
-import { startText, helpText, aboutText } from "./text";
+import { startText, helpText, aboutText } from "../utils/text";
+import { prisma } from "@/prisma/prismaClient";
+import { BroadcastService } from "../broadcast/broadcast-service";
+
 dotenv.config();
 
+if (!process.env.BOT_TOKEN || !process.env.APP_URL) {
+  throw new Error("BOT_TOKEN or APP_URL is not set");
+}
+
 const bot = new Bot(process.env.BOT_TOKEN!);
+
+// Создаем instance BroadcastService
+export const broadcastService = new BroadcastService(bot);
 
 bot.command("start", async (ctx) => {
   await ctx.reply(startText, {
@@ -14,6 +24,32 @@ bot.command("start", async (ctx) => {
       ],
     },
   });
+
+  let user = await prisma.user.findUnique({
+    where: { id: ctx.from?.id.toString() },
+    include: {
+      subscriptions: true,
+    },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        id: ctx.from?.id.toString(),
+        username: ctx.from?.username || "",
+        chatId: ctx.from?.id.toString(),
+      },
+      include: {
+        subscriptions: true,
+      },
+    });
+  }
+  if (!user.chatId) {
+    await prisma.user.update({
+      where: { id: ctx.from?.id.toString() },
+      data: { chatId: ctx.from?.id.toString() },
+    });
+  }
 });
 
 bot.command("help", async (ctx) => {

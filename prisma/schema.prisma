@@ -8,13 +8,16 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  isAdmin       Boolean        @default(false)
-  username      String         @unique
-  avatarUrl     String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  subscriptions Subscription[]
+  id               String         @id @default(cuid())
+  isAdmin          Boolean        @default(false)
+  username         String         @unique
+  avatarUrl        String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  chatId           String?
+  registrationDate DateTime?
+  subscriptions    Subscription[]
+  isActive         Boolean        @default(true)
 }
 
 model Subscription {
@@ -54,7 +57,6 @@ model Topic {
 model Lesson {
   id                     String      @id @default(cuid())
   name                   String
-  videoId                String
   about                  String?
   description            String?
   tasks                  Json[]
@@ -65,13 +67,54 @@ model Lesson {
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
   type                   ContentType
+  videoId                String
   topic                  Topic       @relation(fields: [topicId], references: [id])
 
   @@index([isSubscriptionRequired, orderNumber])
+}
+
+model Broadcast {
+  id          String   @id @default(cuid())
+  name        String?  // название рассылки для админа
+  status      BroadcastStatus @default(PENDING)
+  
+  // Настройки сообщения
+  text               String
+  imageUrl           String?
+  buttonText         String?
+  buttonUrl          String?
+  parseMode          String?  @default("HTML")
+  disableWebPreview  Boolean  @default(false)
+  
+  // Настройки рассылки
+  delayMs            Int      @default(100)
+  skipInactive       Boolean  @default(true)
+  retryOnRateLimit   Boolean  @default(true)
+  
+  // Простая статистика
+  totalUsers    Int      @default(0)
+  successCount  Int      @default(0)
+  errorCount    Int      @default(0)
+  skippedCount  Int      @default(0)
+  
+  // Логи ошибок (JSON массив для критичных ошибок)
+  errorLog      Json[]   @default([])
+  
+  createdAt DateTime @default(now())
+  startedAt DateTime?
+  completedAt DateTime?
 }
 
 enum ContentType {
   player
   coach
   parent
+}
+
+enum BroadcastStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
 }
