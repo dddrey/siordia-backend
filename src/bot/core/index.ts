@@ -70,6 +70,11 @@ bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true);
 });
 
+bot.on("message", async (ctx) => {
+  console.log(ctx.message);
+  return;
+});
+
 bot.on(":successful_payment", async (ctx) => {
   ctx.reply("Вы получили Pro версию");
   if (ctx.update.message?.successful_payment) {

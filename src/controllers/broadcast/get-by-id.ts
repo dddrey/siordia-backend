@@ -17,9 +17,6 @@ export const getBroadcastById = asyncHandler(
       },
     });
 
-    return res.json({
-      success: true,
-      data: broadcast,
-    });
+    return res.json(broadcast);
   }
 );

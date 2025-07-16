@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { createSubscription } from "@/controllers/subscriptions/index";
 import { createPayment } from "@/controllers/payment/create";
+import { checkExpiringSubscriptions } from "@/controllers/subscriptions/check-expiring";
+import { getExpiringStats } from "@/controllers/subscriptions/get-expiring-stats";
+import { isAdmin } from "@/middleware/isAdmin";
 
 const router = Router();
 
@@ -14,5 +17,11 @@ const router = Router();
 router.post("/", createSubscription);
 
 router.post("/payment", createPayment);
+
+// Эндпоинт для получения статистики по истекающим подпискам (только для администраторов)
+router.get("/expiring-stats", isAdmin, getExpiringStats);
+
+// Эндпоинт для проверки истекающих подписок (только для администраторов)
+router.post("/check-expiring", isAdmin, checkExpiringSubscriptions);
 
 export default router;

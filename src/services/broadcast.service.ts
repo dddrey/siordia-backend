@@ -10,6 +10,17 @@ interface CreateBroadcastData {
   imageUrl?: string;
 }
 
+interface UpdateBroadcastData {
+  name?: string;
+  text?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  imageUrl?: string;
+  delayMs?: number;
+  skipInactive?: boolean;
+  retryOnRateLimit?: boolean;
+}
+
 export class BroadcastManagementService {
   /**
    * Создает новую рассылку в БД
@@ -162,6 +173,73 @@ export class BroadcastManagementService {
     });
 
     return broadcasts;
+  }
+
+  /**
+   * Обновляет рассылку (только если статус PENDING)
+   */
+  async updateBroadcast(broadcastId: string, data: UpdateBroadcastData) {
+    // Проверяем существование рассылки
+    const existingBroadcast = await prisma.broadcast.findUnique({
+      where: { id: broadcastId },
+    });
+
+    if (!existingBroadcast) {
+      throw new Error("Рассылка не найдена");
+    }
+
+    // Проверяем статус - можно обновлять только PENDING рассылки
+    if (existingBroadcast.status !== BroadcastStatus.PENDING) {
+      throw new Error("Можно обновлять только рассылки со статусом PENDING");
+    }
+
+    // Обновляем рассылку
+    const updatedBroadcast = await prisma.broadcast.update({
+      where: { id: broadcastId },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.text !== undefined && { text: data.text }),
+        ...(data.buttonText !== undefined && { buttonText: data.buttonText }),
+        ...(data.buttonUrl !== undefined && { buttonUrl: data.buttonUrl }),
+        ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+        ...(data.delayMs !== undefined && { delayMs: data.delayMs }),
+        ...(data.skipInactive !== undefined && {
+          skipInactive: data.skipInactive,
+        }),
+        ...(data.retryOnRateLimit !== undefined && {
+          retryOnRateLimit: data.retryOnRateLimit,
+        }),
+      },
+    });
+
+    return updatedBroadcast;
+  }
+
+  /**
+   * Удаляет рассылку
+   */
+  async deleteBroadcast(broadcastId: string) {
+    // Проверяем существование рассылки
+    const existingBroadcast = await prisma.broadcast.findUnique({
+      where: { id: broadcastId },
+    });
+
+    if (!existingBroadcast) {
+      throw new Error("Рассылка не найдена");
+    }
+
+    // Проверяем статус - нельзя удалять рассылки в процессе выполнения
+    if (existingBroadcast.status === BroadcastStatus.IN_PROGRESS) {
+      throw new Error("Нельзя удалить рассылку в процессе выполнения");
+    }
+
+    // Если рассылка PENDING, просто удаляем
+    // Если COMPLETED/FAILED/CANCELLED, тоже можно удалить
+    await prisma.broadcast.delete({
+      where: { id: broadcastId },
+    });
+
+    return { message: "Рассылка успешно удалена" };
   }
 }
 

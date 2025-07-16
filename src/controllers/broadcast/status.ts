@@ -13,9 +13,6 @@ export const getBroadcastStatus = asyncHandler(
 
     const status = await broadcastManagementService.getBroadcastStatus(id);
 
-    return res.json({
-      success: true,
-      data: status,
-    });
+    return res.json(status);
   }
 );

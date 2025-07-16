@@ -3,43 +3,59 @@ import { Request, Response } from "express";
 import { broadcastManagementService } from "@/services/broadcast.service";
 import { ValidationError } from "@/utils/errors/AppError";
 
+// Функция для проверки валидности URL
+const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const createBroadcast = asyncHandler(
   async (req: Request, res: Response) => {
     const { text, buttonText, buttonUrl, imageUrl } = req.body;
-    console.log(text, buttonText, buttonUrl, imageUrl);
+
     if (!text || text.trim() === "") {
       throw new ValidationError("Текст сообщения обязателен");
     }
 
-    if (buttonText && !buttonUrl) {
-      throw new ValidationError(
-        "Если указан текст кнопки, необходимо указать ссылку"
-      );
+    // Валидация кнопки
+    if (buttonText && buttonText.trim() !== "") {
+      if (!buttonUrl || buttonUrl.trim() === "") {
+        throw new ValidationError(
+          "Если указан текст кнопки, необходимо указать ссылку"
+        );
+      }
+      if (!isValidUrl(buttonUrl)) {
+        throw new ValidationError("Некорректная ссылка для кнопки");
+      }
     }
 
-    if (buttonUrl && !buttonText) {
+    if (
+      buttonUrl &&
+      buttonUrl.trim() !== "" &&
+      (!buttonText || buttonText.trim() === "")
+    ) {
       throw new ValidationError(
         "Если указана ссылка, необходимо указать текст кнопки"
       );
     }
 
+    // Валидация изображения
+    if (imageUrl && imageUrl.trim() !== "" && !isValidUrl(imageUrl)) {
+      throw new ValidationError("Некорректная ссылка для изображения");
+    }
+
     const broadcast = await broadcastManagementService.createBroadcast({
       text,
-      buttonText,
-      buttonUrl,
-      imageUrl,
+      buttonText:
+        buttonText && buttonText.trim() !== "" ? buttonText : undefined,
+      buttonUrl: buttonUrl && buttonUrl.trim() !== "" ? buttonUrl : undefined,
+      imageUrl: imageUrl && imageUrl.trim() !== "" ? imageUrl : undefined,
     });
 
-    return res.status(201).json({
-      success: true,
-      data: {
-        id: broadcast.id,
-        status: broadcast.status,
-        text: broadcast.text,
-        buttonText: broadcast.buttonText,
-        buttonUrl: broadcast.buttonUrl,
-        createdAt: broadcast.createdAt,
-      },
-    });
+    return res.status(201).json(broadcast);
   }
 );
