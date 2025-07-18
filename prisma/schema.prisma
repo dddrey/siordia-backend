@@ -80,7 +80,7 @@ model Broadcast {
   
   // Настройки сообщения
   text               String
-  imageUrl           String?
+  fileId             String?             // Telegram file_id для фото или видео
   buttonText         String?
   buttonUrl          String?
   parseMode          String?  @default("HTML")

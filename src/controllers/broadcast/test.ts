@@ -6,8 +6,8 @@ import { MessageSettings } from "@/bot/broadcast/types";
 
 export const testBroadcast = asyncHandler(
   async (req: Request, res: Response) => {
-    const { text, buttonText, buttonUrl, imageUrl } = req.body;
-    console.log(text, buttonText, buttonUrl, imageUrl);
+    const { text, buttonText, buttonUrl, fileId } = req.body;
+    console.log(text, buttonText, buttonUrl, fileId);
 
     if (!text || text.trim() === "") {
       throw new ValidationError("Текст сообщения обязателен");
@@ -36,15 +36,53 @@ export const testBroadcast = asyncHandler(
     }
 
     try {
-      // Подготавливаем настройки сообщения
-      const messageSettings: MessageSettings = {
-        text,
-        photo: imageUrl || undefined,
-        buttonText: buttonText || undefined,
-        buttonUrl: buttonUrl || undefined,
-        parse_mode: "HTML",
-        disable_web_page_preview: false,
-      };
+      // Определяем тип файла по file_id (фото начинается с "AgAC", видео с "BAA")
+      let messageSettings: MessageSettings;
+
+      if (fileId) {
+        // Для фото file_id обычно начинается с "AgAC", для видео с "BAA" или "BAAD"
+        const isPhoto = fileId.startsWith("AgAC");
+        const isVideo = fileId.startsWith("BAA");
+
+        if (isPhoto) {
+          messageSettings = {
+            text,
+            photo: fileId,
+            buttonText: buttonText || undefined,
+            buttonUrl: buttonUrl || undefined,
+            parse_mode: "HTML",
+            disable_web_page_preview: false,
+          };
+        } else if (isVideo) {
+          messageSettings = {
+            text,
+            video: fileId,
+            buttonText: buttonText || undefined,
+            buttonUrl: buttonUrl || undefined,
+            parse_mode: "HTML",
+            disable_web_page_preview: false,
+          };
+        } else {
+          // Если не можем определить тип, пробуем как фото
+          messageSettings = {
+            text,
+            photo: fileId,
+            buttonText: buttonText || undefined,
+            buttonUrl: buttonUrl || undefined,
+            parse_mode: "HTML",
+            disable_web_page_preview: false,
+          };
+        }
+      } else {
+        // Обычное текстовое сообщение
+        messageSettings = {
+          text,
+          buttonText: buttonText || undefined,
+          buttonUrl: buttonUrl || undefined,
+          parse_mode: "HTML",
+          disable_web_page_preview: false,
+        };
+      }
 
       await broadcastService.sendMessage(
         Number(req.user.chatId),

@@ -15,7 +15,9 @@ const isValidUrl = (url: string): boolean => {
 
 export const createBroadcast = asyncHandler(
   async (req: Request, res: Response) => {
-    const { text, buttonText, buttonUrl, imageUrl } = req.body;
+    const { text, buttonText, buttonUrl, fileId } = req.body;
+
+    console.log(req.body);
 
     if (!text || text.trim() === "") {
       throw new ValidationError("Текст сообщения обязателен");
@@ -43,17 +45,12 @@ export const createBroadcast = asyncHandler(
       );
     }
 
-    // Валидация изображения
-    if (imageUrl && imageUrl.trim() !== "" && !isValidUrl(imageUrl)) {
-      throw new ValidationError("Некорректная ссылка для изображения");
-    }
-
     const broadcast = await broadcastManagementService.createBroadcast({
       text,
       buttonText:
         buttonText && buttonText.trim() !== "" ? buttonText : undefined,
       buttonUrl: buttonUrl && buttonUrl.trim() !== "" ? buttonUrl : undefined,
-      imageUrl: imageUrl && imageUrl.trim() !== "" ? imageUrl : undefined,
+      fileId: fileId && fileId.trim() !== "" ? fileId : undefined,
     });
 
     return res.status(201).json(broadcast);

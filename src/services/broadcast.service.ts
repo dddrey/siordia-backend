@@ -7,7 +7,7 @@ interface CreateBroadcastData {
   text: string;
   buttonText?: string;
   buttonUrl?: string;
-  imageUrl?: string;
+  fileId?: string;
 }
 
 interface UpdateBroadcastData {
@@ -15,7 +15,7 @@ interface UpdateBroadcastData {
   text?: string;
   buttonText?: string;
   buttonUrl?: string;
-  imageUrl?: string;
+  fileId?: string;
   delayMs?: number;
   skipInactive?: boolean;
   retryOnRateLimit?: boolean;
@@ -26,12 +26,12 @@ export class BroadcastManagementService {
    * Создает новую рассылку в БД
    */
   async createBroadcast(data: CreateBroadcastData) {
-    const { text, buttonText, buttonUrl, imageUrl } = data;
+    const { text, buttonText, buttonUrl, fileId } = data;
     // Создаем запись в БД
     const broadcast = await prisma.broadcast.create({
       data: {
         text,
-        imageUrl,
+        fileId,
         buttonText,
         buttonUrl,
         status: BroadcastStatus.PENDING,
@@ -80,14 +80,52 @@ export class BroadcastManagementService {
 
     try {
       // Подготавливаем настройки сообщения
-      const messageSettings: MessageSettings = {
-        text: broadcast.text,
-        photo: broadcast.imageUrl || undefined,
-        buttonText: broadcast.buttonText || undefined,
-        buttonUrl: broadcast.buttonUrl || undefined,
-        parse_mode: broadcast.parseMode as any,
-        disable_web_page_preview: broadcast.disableWebPreview,
-      };
+      let messageSettings: MessageSettings;
+
+      if (broadcast.fileId) {
+        // Определяем тип файла по file_id (фото начинается с "AgAC", видео с "BAA")
+        const isPhoto = broadcast.fileId.startsWith("AgAC");
+        const isVideo = broadcast.fileId.startsWith("BAA");
+
+        if (isPhoto) {
+          messageSettings = {
+            text: broadcast.text,
+            photo: broadcast.fileId,
+            buttonText: broadcast.buttonText || undefined,
+            buttonUrl: broadcast.buttonUrl || undefined,
+            parse_mode: broadcast.parseMode as any,
+            disable_web_page_preview: broadcast.disableWebPreview,
+          };
+        } else if (isVideo) {
+          messageSettings = {
+            text: broadcast.text,
+            video: broadcast.fileId,
+            buttonText: broadcast.buttonText || undefined,
+            buttonUrl: broadcast.buttonUrl || undefined,
+            parse_mode: broadcast.parseMode as any,
+            disable_web_page_preview: broadcast.disableWebPreview,
+          };
+        } else {
+          // Если не можем определить тип, пробуем как фото
+          messageSettings = {
+            text: broadcast.text,
+            photo: broadcast.fileId,
+            buttonText: broadcast.buttonText || undefined,
+            buttonUrl: broadcast.buttonUrl || undefined,
+            parse_mode: broadcast.parseMode as any,
+            disable_web_page_preview: broadcast.disableWebPreview,
+          };
+        }
+      } else {
+        // Обычное текстовое сообщение
+        messageSettings = {
+          text: broadcast.text,
+          buttonText: broadcast.buttonText || undefined,
+          buttonUrl: broadcast.buttonUrl || undefined,
+          parse_mode: broadcast.parseMode as any,
+          disable_web_page_preview: broadcast.disableWebPreview,
+        };
+      }
 
       console.log(messageSettings);
 
@@ -201,7 +239,7 @@ export class BroadcastManagementService {
         ...(data.text !== undefined && { text: data.text }),
         ...(data.buttonText !== undefined && { buttonText: data.buttonText }),
         ...(data.buttonUrl !== undefined && { buttonUrl: data.buttonUrl }),
-        ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+        ...(data.fileId !== undefined && { fileId: data.fileId }),
         ...(data.delayMs !== undefined && { delayMs: data.delayMs }),
         ...(data.skipInactive !== undefined && {
           skipInactive: data.skipInactive,

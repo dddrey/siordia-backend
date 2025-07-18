@@ -1,6 +1,7 @@
 export interface MessageSettings {
   text: string;
   photo?: string; // URL фото или file_id
+  video?: string; // URL видео или file_id
   buttonText?: string; // текст кнопки
   buttonUrl?: string; // ссылка для кнопки
   // Дополнительные настройки для будущего:

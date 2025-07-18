@@ -72,7 +72,56 @@ bot.on("pre_checkout_query", async (ctx) => {
 
 bot.on("message", async (ctx) => {
   console.log(ctx.message);
-  return;
+
+  // Проверяем, есть ли фото или видео в сообщении
+  const photo = ctx.message?.photo;
+  const video = ctx.message?.video;
+
+  if (!photo && !video) {
+    return; // Если нет фото или видео, игнорируем сообщение
+  }
+
+  // Проверяем, является ли пользователь админом
+  const user = await prisma.user.findUnique({
+    where: { id: ctx.from?.id.toString() },
+  });
+
+  if (!user || !user.isAdmin) {
+    return;
+  }
+
+  try {
+    let fileId: string;
+    let fileType: string;
+
+    if (photo) {
+      // Для фото берём самое высокое качество (последний элемент массива)
+      fileId = photo[photo.length - 1].file_id;
+      fileType = "фото";
+    } else {
+      // Для видео берём file_id
+      fileId = video!.file_id;
+      fileType = "видео";
+    }
+
+    // Получаем информацию о файле для создания URL для скачивания
+    const fileInfo = await ctx.api.getFile(fileId);
+    const filePath = fileInfo.file_path;
+    const fileUrl = `https://api.telegram.org/file/bot${bot.token}/${filePath}`;
+
+    // Отправляем админу и file_id для рассылки, и URL для скачивания
+    await ctx.reply(
+      `✅ Файл обработан!\n\n` +
+        `📁 Тип: ${fileType}\n` +
+        `🆔 File ID для рассылки: \`${fileId}\`\n` +
+        `🔗 Ссылка для скачивания: ${fileUrl}\n\n` +
+        `💡 Для рассылки используйте File ID, а ссылку - для скачивания файла.`,
+      { parse_mode: "Markdown" }
+    );
+  } catch (error) {
+    console.error("Ошибка при обработке файла:", error);
+    await ctx.reply("❌ Произошла ошибка при обработке файла.");
+  }
 });
 
 bot.on(":successful_payment", async (ctx) => {

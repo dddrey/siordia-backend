@@ -21,11 +21,13 @@ export const updateBroadcast = asyncHandler(
       text,
       buttonText,
       buttonUrl,
-      imageUrl,
+      fileId,
       delayMs,
       skipInactive,
       retryOnRateLimit,
     } = req.body;
+
+    console.log(req.body);
 
     if (!id) {
       throw new ValidationError("ID рассылки обязателен");
@@ -58,15 +60,6 @@ export const updateBroadcast = asyncHandler(
       );
     }
 
-    // Валидация изображения
-    if (
-      imageUrl !== undefined &&
-      imageUrl.trim() !== "" &&
-      !isValidUrl(imageUrl)
-    ) {
-      throw new ValidationError("Некорректная ссылка для изображения");
-    }
-
     // Валидация числовых параметров
     if (delayMs !== undefined && (typeof delayMs !== "number" || delayMs < 0)) {
       throw new ValidationError("Задержка должна быть положительным числом");
@@ -86,8 +79,7 @@ export const updateBroadcast = asyncHandler(
             buttonUrl !== undefined && buttonUrl.trim() === ""
               ? null
               : buttonUrl,
-          imageUrl:
-            imageUrl !== undefined && imageUrl.trim() === "" ? null : imageUrl,
+          fileId: fileId !== undefined && fileId.trim() === "" ? null : fileId,
           delayMs,
           skipInactive,
           retryOnRateLimit,

@@ -46,8 +46,16 @@ export class BroadcastService {
    * Приватный метод для валидации настроек сообщения
    */
   private validateMessageSettings(settings: MessageSettings): void {
+    console.log(settings);
     if (!settings.text || settings.text.trim() === "") {
       throw new Error("Текст сообщения не может быть пустым");
+    }
+
+    // Проверяем, что не используются одновременно фото и видео
+    if (settings.photo && settings.video) {
+      throw new Error(
+        "Нельзя одновременно использовать фото и видео в одном сообщении"
+      );
     }
 
     // Валидация кнопки - если есть текст кнопки, должна быть и ссылка
@@ -108,8 +116,16 @@ export class BroadcastService {
         caption: messageSettings.text,
         ...messageOptions,
       });
-    } else {
-      // Обычное текстовое сообщение
+    }
+    // Если есть видео, отправляем видео с подписью
+    else if (messageSettings.video) {
+      await this.bot.api.sendVideo(chatId, messageSettings.video, {
+        caption: messageSettings.text,
+        ...messageOptions,
+      });
+    }
+    // Обычное текстовое сообщение
+    else {
       await this.bot.api.sendMessage(
         chatId,
         messageSettings.text,
