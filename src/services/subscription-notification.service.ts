@@ -98,7 +98,9 @@ export class SubscriptionNotificationService {
       parse_mode: "HTML" as const,
       disable_web_page_preview: true,
       buttonText: "Продлить подписку",
-      buttonUrl: process.env.MINI_APP_URL || "https://your-app-url.com",
+      buttonUrl:
+        process.env.MINI_APP_URL +
+        "?startapp=eyJwYXRoIjoiL3N1YnNjcmlwdGlvbnMifQ==",
     };
 
     await broadcastService.sendMessage(

@@ -10,7 +10,9 @@
     "start:prod": "prisma migrate deploy && npm run start",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "test": "jest --config jest.config.js"
+    "test": "jest --config jest.config.js",
+    "test:subscriptions": "ts-node-dev --respawn --transpile-only scripts/create-test-subscriptions.ts",
+    "cleanup:subscriptions": "ts-node-dev --respawn --transpile-only scripts/cleanup-test-subscriptions.ts"
   },
   "keywords": [],
   "author": "",
