@@ -2,7 +2,7 @@ import { asyncHandler } from "@/middleware/asyncHandler";
 import { ValidationError } from "@/utils/errors/AppError";
 import { ContentType } from "@prisma/client";
 import { Request, Response } from "express";
-import bot from "@/bot";
+import bot from "@/bot/core";
 export const createPayment = asyncHandler(
   async (req: Request, res: Response) => {
     const { type } = req.body;
