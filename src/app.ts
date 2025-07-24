@@ -15,6 +15,7 @@ import { authenticateUser } from "./controllers/auth/authenticate";
 import fileRoutes from "./controllers/auth/fileRoutes";
 import userRoutes from "./routes/user.routes";
 import broadcastRoutes from "./routes/broadcast.routes";
+import { getAllUsers } from "./controllers/user/getAllUsers";
 
 const app = express();
 app.use((req, res, next) => {
@@ -41,6 +42,7 @@ app.use("/lessons", lessonRoutes);
 app.use("/broadcast", broadcastRoutes);
 app.use("/subscriptions", subscriptionRoutes);
 app.use("/statistics", statisticsRoutes);
+app.get("/user/all", getAllUsers);
 app.use("/user", userRoutes);
 
 app.use(errorHandler);
