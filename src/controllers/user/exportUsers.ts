@@ -1,9 +1,17 @@
 import { asyncHandler } from "@/middleware/asyncHandler";
 import { Request, Response } from "express";
 import { prisma } from "@/prisma/prismaClient";
+import { ValidationError } from "@/utils/errors/AppError";
 import * as XLSX from "xlsx";
+import bot from "@/bot/core";
+import { InputFile } from "grammy";
 
 export const exportUsers = asyncHandler(async (req: Request, res: Response) => {
+  // Проверяем что у админа есть chatId для отправки файла
+  if (!req.user?.chatId) {
+    throw new ValidationError("У пользователя нет chatId для отправки файла");
+  }
+
   // Получаем всех пользователей
   const users = await prisma.user.findMany({
     include: {
@@ -82,16 +90,42 @@ export const exportUsers = asyncHandler(async (req: Request, res: Response) => {
     bookType: "xlsx",
   });
 
-  // Устанавливаем заголовки для скачивания файла
+  // Формируем имя файла с датой
   const fileName = `users_export_${new Date().toISOString().split("T")[0]}.xlsx`;
 
-  res.setHeader(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  );
-  res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-  res.setHeader("Content-Length", excelBuffer.length);
+  try {
+    // Отправляем файл админу через Telegram бота
+    await bot.api.sendDocument(
+      Number(req.user.chatId),
+      new InputFile(excelBuffer, fileName),
+      {
+        caption:
+          `📊 Экспорт пользователей\n\n` +
+          `📅 Дата создания: ${new Date().toLocaleDateString("ru-RU")}\n` +
+          `👥 Всего пользователей: ${users.length}\n` +
+          `✅ Активных: ${users.filter((u) => u.isActive).length}\n` +
+          `🔐 Админов: ${users.filter((u) => u.isAdmin).length}\n` +
+          `📱 С подписками: ${users.filter((u) => u.subscriptions.length > 0).length}`,
+        parse_mode: "HTML",
+      }
+    );
 
-  // Отправляем файл
-  res.send(excelBuffer);
+    // Возвращаем успешный ответ
+    res.json({
+      success: true,
+      message: "Excel файл успешно отправлен в Telegram",
+      data: {
+        totalUsers: users.length,
+        activeUsers: users.filter((u) => u.isActive).length,
+        adminUsers: users.filter((u) => u.isAdmin).length,
+        usersWithSubscriptions: users.filter((u) => u.subscriptions.length > 0)
+          .length,
+        fileName,
+        exportDate: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Ошибка при отправке файла через бота:", error);
+    throw new ValidationError("Не удалось отправить файл через Telegram бота");
+  }
 });
